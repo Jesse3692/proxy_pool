@@ -1,14 +1,20 @@
-version: '2'
+version: "3"
 services:
-  proxy_pool:
-    build: .
-    container_name: proxy_pool
+  redis4proxypool:
+    image: redis:alpine
+    container_name: redis4proxypool
     ports:
-      - "5010:5010"
-    links:
-      - proxy_redis
+      - "6374:6379"
+  proxypool:
+    image: "germey/proxypool:master"
+    container_name: proxypool
+    ports:
+      - "5555:5555"
+    restart: always
+    # volumes:
+    #   - proxypool/crawlers/private:/app/proxypool/crawlers/private
     environment:
-      DB_CONN: "redis://@proxy_redis:6379/0"
-  proxy_redis:
-    image: "redis"
-    container_name: proxy_redis
+      PROXYPOOL_REDIS_HOST: redis4proxypool
+      REDIS_HOST: redis
+      TEST_URL: https://imgsed.com/
+      REDIS_KEY: proxies:imgsed
